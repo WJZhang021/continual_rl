@@ -28,6 +28,7 @@ class ActiveColumnNet(ImpalaNet):
     def __init__(self, observation_space, action_spaces, model_flags, knowledge_base_column):
         super().__init__(observation_space, action_spaces, model_flags)
         self._adaptors = {}
+        self._gates = {}
         self._adaptor_params = []
         self.eval_on_kb = None  # Gets set externally
         self.eval_is_stochastic = None  # Gets set externally
@@ -46,6 +47,12 @@ class ActiveColumnNet(ImpalaNet):
                     if adaptor is not None:
                         self._adaptor_params.extend(adaptor.parameters())
 
+                    # Create the channel attention gate
+                    gate = self._create_gate(module)
+                    self._gates[module_name] = gate
+                    if gate is not None:
+                        self._adaptor_params.extend(gate.parameters())
+
                     # Register afterwards because otherwise the copied module will have the hook too
                     module.register_forward_hook(self._create_incorporate_knowledge_base_hook(module_name))
                 else:
@@ -61,10 +68,22 @@ class ActiveColumnNet(ImpalaNet):
         # Don't reset knowledge base modules
         if (isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear)) and not module in self._knowledge_base.modules():
             module.reset_parameters()
+            # Explicitly reset the bias for gate linear layers to +2.0 (Fix for Vulnerability 1)
+            if getattr(module, 'is_gate_linear', False):
+                nn.init.constant_(module.bias, 2.0)
 
     def reset(self):
         # Note: reset is only applied to Linear and Conv2D layers, including adaptors
         self.apply(self._reset_layer)
+        
+        # Explicitly apply reset to dynamically created adaptors and gates 
+        # (Standard dictionaries do not register modules as children in PyTorch)
+        for adaptor in self._adaptors.values():
+            if adaptor is not None:
+                adaptor.apply(self._reset_layer)
+        for gate in self._gates.values():
+            if gate is not None:
+                gate.apply(self._reset_layer)
 
     def _create_incorporate_knowledge_base_hook(self, module_name):
         """
@@ -77,11 +96,21 @@ class ActiveColumnNet(ImpalaNet):
 
             # Apply adaptor to knowledge base outputs
             adaptor = self._adaptors[module_name]
+            gate = self._gates.get(module_name)
             if adaptor is not None:
                 # We adapt using the KB's previous layer. We do this by using the input to the layer that matches
                 # the current one. We skip the first layer. See comment in __init__
                 knowledge_base_inputs = self._knowledge_base.latest_layerwise_inputs[module_name][0]
                 adapted_knowledge = adaptor(knowledge_base_inputs)
+
+                # Channel Attention Gate mechanism
+                if gate is not None:
+                    # Global Average Pooling on Active Column's input features: [Batch, Channels, H, W] -> [Batch, Channels]
+                    pooled_input = input[0].mean(dim=[-2, -1])
+                    gate_weights = gate(pooled_input)
+                    # Reshape from [Batch, Channels] to [Batch, Channels, 1, 1] to broadcast against feature maps
+                    gate_weights = gate_weights.unsqueeze(-1).unsqueeze(-1)
+                    adapted_knowledge = adapted_knowledge * gate_weights
 
                 # Then add the active column inputs to the next layer
                 result = output + adapted_knowledge
@@ -89,6 +118,25 @@ class ActiveColumnNet(ImpalaNet):
             return result
 
         return hook
+
+    def _create_gate(self, module):
+        """
+        Creates a lightweight channel attention gate for Conv2d layers.
+        """
+        if isinstance(module, nn.Conv2d):
+            gate_linear = nn.Linear(module.in_channels, module.out_channels)
+            gate_linear.is_gate_linear = True
+            # Initialize with positive bias so it defaults to passing most old knowledge at the beginning of a task
+            nn.init.constant_(gate_linear.bias, 2.0)
+            
+            gate = nn.Sequential(
+                gate_linear,
+                nn.Sigmoid()
+            )
+            return gate
+        
+        # We only apply gating to core feature extractors (Conv2d), returning None for Linear heads.
+        return None
 
     def _create_adaptor(self, module):
         """

@@ -62,6 +62,12 @@ def load_progress_and_compress():
     return PolicyStruct(ProgressAndCompressPolicy, ProgressAndCompressPolicyConfig)
 
 
+def load_pc_wj():
+    from continual_rl.policies.PCwj.PCwj_policy import ProgressAndCompressPolicy
+    from continual_rl.policies.PCwj.PCwj_policy_config import ProgressAndCompressPolicyConfig
+    return PolicyStruct(ProgressAndCompressPolicy, ProgressAndCompressPolicyConfig)
+
+
 def load_play():
     from continual_rl.policies.play.play_policy import PlayPolicy
     from continual_rl.policies.play.play_policy_config import PlayPolicyConfig
@@ -85,7 +91,6 @@ def get_available_policies():
                          "clear": load_clear,
                          "ewc": load_ewc,
                          "online_ewc": load_online_ewc,
-                         "progress_and_compress": load_progress_and_compress,
-                         "play": load_play,
+                         "progress_and_compress": load_progress_and_compress,                         "pc_wj": load_pc_wj,                         "play": load_play,
                          "sane": load_sane_ensemble})
     return policies
