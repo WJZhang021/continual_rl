@@ -2,12 +2,12 @@
 #SBATCH --job-name=PCwj_Run_Procgen
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=4      # 这里要确保和 config 中的 num_actors 一致
-#SBATCH --mem=16G               # 32个进程建议给到 48G 内存更稳妥，Procgen 比较吃内存
-#SBATCH --time=18:00:00
+#SBATCH --cpus-per-task=16      # 这里要确保和 config 中的 num_actors 一致
+#SBATCH --mem=24G               # 32个进程建议给到 48G 内存更稳妥，Procgen 比较吃内存
+#SBATCH --time=8:00:00
 #SBATCH --partition=spgpu
 #SBATCH --gres=gpu:1
-#SBATCH --account=jiasi0
+#SBATCH --account=ece567w26_class
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
