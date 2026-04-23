@@ -21,7 +21,8 @@ class EWCTaskInfo(object):
         # Could hash output_dir_str if this is a problem.
         output_dir_str = os.path.normpath(model_flags.output_dir).replace(os.path.sep, '-')
         permanent_path = os.path.join(
-            model_flags.large_file_path,
+            #model_flags.large_file_path,
+            "/tmp",
             "file_backed",
             output_dir_str,
             task_name,

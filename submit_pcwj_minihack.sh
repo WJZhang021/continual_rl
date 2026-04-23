@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name=PCwj_Run
+#SBATCH --job-name=PCwj_Run_MiniHack
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=32      # 这里要确保和 config 中的 num_actors 一致
-#SBATCH --mem=48G               # 32个进程建议给到 48G 内存更稳妥，Procgen 比较吃内存
-#SBATCH --time=24:00:00
+#SBATCH --cpus-per-task=16      # 这里要确保和 config 中的 num_actors 一致
+#SBATCH --mem=24G               # 32个进程建议给到 48G 内存更稳妥，Procgen 比较吃内存
+#SBATCH --time=8:00:00
 #SBATCH --partition=spgpu
 #SBATCH --gres=gpu:1
-#SBATCH --account=coe-mavens    # 别忘了加上你的计费账号
+#SBATCH --account=ece567w26_class    # 别忘了加上你的计费账号
 #SBATCH --output=logs/%x-%j.out
 #SBATCH --error=logs/%x-%j.err
 
