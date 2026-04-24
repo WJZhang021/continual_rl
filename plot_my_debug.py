@@ -47,7 +47,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # It expects you to provide the base directory containing the run folder.
     # Because your 'runs' paths above are relative to where you run the script, '.' is fine.
-    parser.add_argument('--exp-dir', type=str, default='.')
+    parser.add_argument('-d', '--exp-dir', type=str, default='.')
     args = parser.parse_args()
 
     # Pass the 'exp_dir' into our dictionary
