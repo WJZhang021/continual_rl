@@ -70,7 +70,7 @@ class ActiveColumnNet(ImpalaNet):
             module.reset_parameters()
             # Explicitly reset the bias for gate linear layers to +2.0 (Fix for Vulnerability 1)
             if getattr(module, 'is_gate_linear', False):
-                nn.init.constant_(module.bias, 2.0)
+                nn.init.constant_(module.bias, 0.5)
 
     def reset(self):
         # Note: reset is only applied to Linear and Conv2D layers, including adaptors
