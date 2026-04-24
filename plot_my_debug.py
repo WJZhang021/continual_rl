@@ -41,6 +41,11 @@ DEBUG_PROCGEN = dict(
     which_exp='debug_procgen', # prefix for outputs
     xaxis_tickvals=list(np.arange(0, 150e6 + 1, 30e6)),
     cache_dir='.', # Where to put the cache parsing pkl
+    tag_base='eval_reward',
+    legend_size=30,
+    title_size=40,
+    axis_size=20,
+    axis_label_size=30,
 )
 
 if __name__ == "__main__":
