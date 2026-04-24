@@ -6,7 +6,7 @@ import numpy as np
 from continual_rl.utils.cora_metrics import TASKS_PROCGEN
 from continual_rl.utils.metrics import Metrics
 import plotly.io as pio
-pio.kaleido.scope.mathjax = None
+pio.defaults.mathjax = None
 
 # 1. Define where your downloaded test data lives
 # We'll mock a "model" out of your downloaded debug folder
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # It expects you to provide the base directory containing the run folder.
     # Because your 'runs' paths above are relative to where you run the script, '.' is fine.
     parser.add_argument('--exp-dir', type=str, default='.')
-    args = parser.add_argument_group('visualize').parse_args()
+    args = parser.parse_args()
 
     # Pass the 'exp_dir' into our dictionary
     DEBUG_PROCGEN['exp_dir'] = args.exp_dir

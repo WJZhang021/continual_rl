@@ -4,7 +4,7 @@ from continual_rl.utils.metrics import Metrics
 
 # see https://github.com/plotly/Kaleido/issues/101
 import plotly.io as pio
-pio.kaleido.scope.mathjax = None  # Prevents a weird "Loading MathJax" artifact in rendering the pdf
+pio.defaults.mathjax = None  # Prevents a weird "Loading MathJax" artifact in rendering the pdf
 
 
 TASKS_ATARI = {

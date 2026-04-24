@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 
 # see https://github.com/plotly/Kaleido/issues/101
 import plotly.io as pio
-pio.kaleido.scope.mathjax = None  # Prevents a weird "Loading MathJax" artifact in rendering the pdf
+pio.defaults.mathjax = None  # Prevents a weird "Loading MathJax" artifact in rendering the pdf
 
 
 USE_ISOLATED_ZSFT = True
