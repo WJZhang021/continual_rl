@@ -482,7 +482,10 @@ class Metrics(object):
                     subsequent_region = [(subsequent_task_id + offset) * task_steps,
                                          (subsequent_task_id + offset + 1) * task_steps]
                     subsequent_task_rewards = self.get_rewards_for_region(xs, ys, subsequent_region)
-                    last_reward = subsequent_task_rewards[-1]
+                    if len(subsequent_task_rewards) > 0:
+                        last_reward = subsequent_task_rewards[-1]
+                    else:
+                        last_reward = 0
                     forgetting = max_task_value - last_reward
     
                     if cycle_id not in per_run_forgetting_per_subsequent[subsequent_task_id]:
@@ -507,13 +510,19 @@ class Metrics(object):
             for prior_task_id in prior_task_ids:
                 prior_region = [prior_task_id * task_steps, (prior_task_id+1) * task_steps]  # TODO: could do from the end of the task up to the subsequent one we're looking at...
                 subsequent_task_rewards = self.get_rewards_for_region(xs, ys, prior_region)
-                last_reward = subsequent_task_rewards[-1]
+                if len(subsequent_task_rewards) > 0:
+                    last_reward = subsequent_task_rewards[-1]
+                else:
+                    last_reward = 0
                 baseline = initial_task_value
     
                 if USE_ISOLATED_ZSFT and prior_task_id > 0:
                     pre_task_region = [0, prior_task_id * task_steps]  # Get the rewards up to and not including our "previous task"
                     subsequent_pre_task_rewards = self.get_rewards_for_region(xs, ys, pre_task_region)
-                    baseline = subsequent_pre_task_rewards[-1]
+                    if len(subsequent_pre_task_rewards) > 0:
+                        baseline = subsequent_pre_task_rewards[-1]
+                    else:
+                        baseline = 0
     
                 transfer = last_reward - baseline
                 per_run_transfer_per_prior[prior_task_id].append(transfer)
