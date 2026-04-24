@@ -13,9 +13,9 @@ pio.defaults.mathjax = None
 MODELS_DEBUG = {
     "PCwj": dict(
         name='pcwj',
-        # Instead of 20 runs, you point to exactly the folder(s) you have.
-        # "results_pcwj_procgen/tmp/pcwj_procgen_debug/0"
-        runs=['results_pcwj_procgen/tmp/pcwj_procgen_debug/0'], 
+        # `runs` will be joined with `--exp-dir`.
+        # Since you are passing the exact folder via `-d`, just use an empty string or '.' here.
+        runs=[''], 
         color='rgba(152, 67, 63, 1)', # Plot color (Red-ish)
         color_alpha=0.3,
     ),
