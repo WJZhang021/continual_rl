@@ -59,9 +59,6 @@ if __name__ == "__main__":
     
     # 3.1 Continual Evaluation (The main learning curves)
     print("Generating continual evaluation plots...")
-    metrics.continual_evaluation(tag='eval_reward_mean', title='Debug Procgen', y_title='Reward', output_file='debug_procgen_curves.pdf')
-
-    # 3.2 If you had full data, you could also compute the forgetting matrices:
-    # metrics.transfer_and_forgetting_table('eval_reward_mean')
+    metrics.visualize()
     
     print("Done! Check your current folder for the generated .pdf files.")
